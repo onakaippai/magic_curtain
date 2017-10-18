@@ -1,4 +1,6 @@
 import pygame
+from numpy import *
+from numpy.random import *
 
 pygame.init()
 pygame.display.set_caption('Magic Curtain')
@@ -26,9 +28,11 @@ img_winter = pygame.transform.scale(pygame.image.load(imgpath + 'winter.png'),(h
 img_curtain = pygame.transform.scale(pygame.image.load(imgpath + 'curtain.jpg'),(height_screen,height_screen))
 mask_wall = pygame.transform.scale(pygame.image.load(imgpath + 'wall_mask.png'),(height_screen,height_screen))
 mask_window = pygame.transform.scale(pygame.image.load(imgpath + 'window_mask.png'),(height_screen,height_screen))
-mask_curtain = pygame.transform.scale(pygame.image.load(imgpath + 'curtain_mask.png'),(height_screen,height_screen))
+mask_curtain = pygame.transform.scale(pygame.image.load(imgpath + 'curtain_mask2.png'),(height_screen,height_screen))
 
 season_or_wall = True
+curtain_param = zeros((20,4))
+img_outside = img_spring
 idx_season = 0
 idx_wall = 0
 idx_step = 0
@@ -133,8 +137,7 @@ def main_menu():
                     if idx_wall > 21:
                         idx_wall = 21                  
             
-        screen.fill(white)
-        img_outside = img_spring
+        screen.fill(white)        
         if idx_season == 0:
             img_outside = img_spring
         elif idx_season == 1:
@@ -222,9 +225,41 @@ def main_menu():
                 pygame.draw.rect(screen, show_color, [850, 120+i*20, 100, 20])
         pygame.display.update()
 
-def create_texture():
-    pass
-
+def draw_curtain(idx_curtain):
+    
+    screen.fill(white)
+    screen.blit(img_curtain,(0,0))
+    window_surf = pygame.Surface((img_outside.get_width(), img_outside.get_height())).convert()
+    window_surf.blit(img_outside, (0, 0))
+    window_surf.blit(mask_window, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)  
+    window_surf.set_colorkey((0,0,0))
+    window_surf.set_alpha(180) 
+    screen.blit(window_surf, (0,0))
+    
+    wall_surf = pygame.Surface((img_outside.get_width(), img_outside.get_height()))
+    if idx_wall == 0:
+        wall_color = white
+    elif idx_wall == 1:
+        wall_color = light_gray
+    elif idx_wall == 2:
+        wall_color = gray
+    elif idx_wall > 2:
+        wall_color = pygame.Color(0,0,0)
+        wall_color.hsva = ((idx_wall-3)*20,10,90,100)
+    wall_surf.fill(wall_color)
+    wall_surf.blit(mask_wall, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)  
+    wall_surf.set_colorkey((0,0,0))
+    wall_surf.set_alpha(180) 
+    screen.blit(wall_surf, (0,0))
+    
+    curtain_surf = pygame.Surface((img_outside.get_width(), img_outside.get_height()))
+    curtain_color = (curtain_param[idx_curtain][1], curtain_param[idx_curtain][2], curtain_param[idx_curtain][3])
+    curtain_surf.fill(curtain_color)
+    curtain_surf.blit(mask_curtain, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)  
+    curtain_surf.set_colorkey((0,0,0))
+    curtain_surf.set_alpha(curtain_param[idx_curtain][0]) 
+    screen.blit(curtain_surf, (0,0))
+    
 def get_score():
     pass
 
@@ -251,18 +286,32 @@ def generation_end():
     pass
 
 def clac_params():
-    pass
+    seed(idx_step)
+    # whole curtain
+    #
+    # lines(Surface, color, closed, pointlist, width=1)
+    # aalines(Surface, color, closed, pointlist, blend=1)
+    if idx_step == 2:          
+        for i in range(20):
+            curtain_param[i][0] = randint(180) # surf alpha
+            curtain_param[i][1] = randint(255) # background R
+            curtain_param[i][2] = randint(255) # background G
+            curtain_param[i][3] = randint(255) # background B
+            
+        
     
 def show_and_score():
     generation_start()
     clac_params()
+    idx_curtain = 0
     while True:
         for event in pygame.event.get():                      
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     exit_box()
-        screen.fill(white)
-        create_texture()
+                if event.key == pygame.K_RETURN:
+                    idx_curtain += 1
+        draw_curtain(idx_curtain)
         get_score()        
         pygame.display.update()
     generation_end()
@@ -274,7 +323,8 @@ while True:
     elif idx_step == 1:
         main_menu()
         idx_step = 2
-    elif idx_step == 5:
+    elif idx_step == 7:
+        # 5 generation
         break
     else:
         show_and_score()
