@@ -31,8 +31,9 @@ mask_window = pygame.transform.scale(pygame.image.load(imgpath + 'window_mask.pn
 mask_curtain = pygame.transform.scale(pygame.image.load(imgpath + 'curtain_mask2.png'),(height_screen,height_screen))
 
 season_or_wall = True
-curtain_param = zeros((20,4))
+curtain_param = zeros((20,16))
 img_outside = img_spring
+line_param = []
 idx_season = 0
 idx_wall = 0
 idx_step = 0
@@ -226,6 +227,7 @@ def main_menu():
         pygame.display.update()
 
 def draw_curtain(idx_curtain):
+    global line_param
     
     screen.fill(white)
     screen.blit(img_curtain,(0,0))
@@ -255,6 +257,40 @@ def draw_curtain(idx_curtain):
     curtain_surf = pygame.Surface((img_outside.get_width(), img_outside.get_height()))
     curtain_color = (curtain_param[idx_curtain][1], curtain_param[idx_curtain][2], curtain_param[idx_curtain][3])
     curtain_surf.fill(curtain_color)
+    
+    num_line = int(curtain_param[idx_curtain][4])
+    line_step = 300/curtain_param[idx_curtain][4]
+    if line_param == []:
+        line_param = zeros((num_line, 6), dtype = int)        
+        for i in range(num_line):
+            line_color = randint(-curtain_param[idx_curtain][9],curtain_param[idx_curtain][9])
+            line_param[i][0] = min(255,max(0,curtain_param[idx_curtain][1] + line_color))
+            line_param[i][1] = min(255,max(0,curtain_param[idx_curtain][2] + line_color))
+            line_param[i][2] = min(255,max(0,curtain_param[idx_curtain][3] + line_color))
+            if (line_param[i][0],line_param[i][1],line_param[i][2]) == (0,0,0):
+                (line_param[i][0],line_param[i][1],line_param[i][2]) = (1,1,1)
+            line_param[i][3] = randint(int(line_step*i),int(line_step*(i+1)))
+            line_param[i][4] = randint(curtain_param[idx_curtain][7], curtain_param[idx_curtain][8])
+            if curtain_param[idx_curtain][10] < 50:            
+                start_pos = (line_param[i][3],0)
+                end_pos = (line_param[i][3],line_param[i][4])
+            else:
+                start_pos = (line_param[i][3],600-line_param[i][4])
+                end_pos = (line_param[i][3],600)
+            line_param[i][5] = randint(int(line_step*curtain_param[idx_curtain][5]/100),int(line_step*curtain_param[idx_curtain][6]/100))            
+            pygame.draw.line(curtain_surf, (line_param[i][0],line_param[i][1],line_param[i][2]), start_pos, end_pos, line_param[i][5])
+    else:
+        for i in range(num_line):
+            if curtain_param[idx_curtain][10] < 50:            
+                start_pos = (line_param[i][3],0)
+                end_pos = (line_param[i][3],line_param[i][4])
+            else:
+                start_pos = (line_param[i][3],600-line_param[i][4])
+                end_pos = (line_param[i][3],600)
+            pygame.draw.line(curtain_surf, (line_param[i][0],line_param[i][1],line_param[i][2]), start_pos, end_pos, line_param[i][5])
+                
+            
+    
     curtain_surf.blit(mask_curtain, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)  
     curtain_surf.set_colorkey((0,0,0))
     curtain_surf.set_alpha(curtain_param[idx_curtain][0]) 
@@ -289,7 +325,7 @@ def clac_params():
     seed(idx_step)
     # whole curtain
     #
-    # lines(Surface, color, closed, pointlist, width=1)
+    # line(Surface, color, start_pos, end_pos, width=1)
     # aalines(Surface, color, closed, pointlist, blend=1)
     if idx_step == 2:          
         for i in range(20):
@@ -298,9 +334,18 @@ def clac_params():
             curtain_param[i][2] = randint(255) # background G
             curtain_param[i][3] = randint(255) # background B
             
+            curtain_param[i][4] = randint(30) # v line num
+            curtain_param[i][5] = randint(50) # line width min %
+            curtain_param[i][6] = randint(51,101) # line width max %
+            curtain_param[i][7] = randint(300) # line long min
+            curtain_param[i][8] = randint(301,601) # line long max
+            curtain_param[i][9] = randint(255) # line R adjust range
+            curtain_param[i][10] = randint(100) # line direction %
+            
         
     
 def show_and_score():
+    global line_param
     generation_start()
     clac_params()
     idx_curtain = 0
@@ -310,6 +355,7 @@ def show_and_score():
                 if event.key == pygame.K_ESCAPE:
                     exit_box()
                 if event.key == pygame.K_RETURN:
+                    line_param = []
                     idx_curtain += 1
         draw_curtain(idx_curtain)
         get_score()        
