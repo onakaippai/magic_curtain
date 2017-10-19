@@ -32,7 +32,6 @@ mask_curtain = pygame.transform.scale(pygame.image.load(imgpath + 'curtain_mask2
 
 season_or_wall = True
 curtain_param = zeros((20,16))
-img_outside = img_spring
 line_param = []
 idx_season = 0
 idx_wall = 0
@@ -228,6 +227,15 @@ def main_menu():
 
 def draw_curtain(idx_curtain):
     global line_param
+    
+    if idx_season == 0:
+        img_outside = img_spring
+    elif idx_season == 1:
+        img_outside = img_summer
+    elif idx_season == 2:
+        img_outside = img_autumn
+    elif idx_season == 3:
+        img_outside = img_winter
     
     screen.fill(white)
     screen.blit(img_curtain,(0,0))
