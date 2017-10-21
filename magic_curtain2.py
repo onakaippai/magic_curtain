@@ -33,6 +33,7 @@ mask_curtain = pygame.transform.scale(pygame.image.load(imgpath + 'curtain_mask2
 season_or_wall = True
 curtain_param = zeros((100,100))
 line_param = []
+fore_param = []
 idx_season = 0
 idx_wall = 0
 idx_step = 0
@@ -227,6 +228,7 @@ def main_menu():
 
 def draw_curtain(idx_curtain):
     global line_param
+    global fore_param
     
     if idx_season == 0:
         img_outside = img_spring
@@ -268,128 +270,214 @@ def draw_curtain(idx_curtain):
     
     line_surf = pygame.Surface((img_outside.get_width()/2, img_outside.get_height()))
     line_surf.fill((0,0,0))
-    if curtain_param[idx_curtain][13]<50:
-        line_size = 300 # v
-        num_line = int(curtain_param[idx_curtain][4])
-    else:
-        line_size = 600 # h
-        num_line = int(curtain_param[idx_curtain][4]) * 2
-    if curtain_param[idx_curtain][11] < 50:
-        line_start = 0
-        line_end = line_size * curtain_param[idx_curtain][12]/100
-    else:
-        line_start = line_size - line_size * curtain_param[idx_curtain][12]/100
-        line_end = line_size                                                  
-    line_range = line_end - line_start + 1                        
     
-    line_step = line_range/curtain_param[idx_curtain][4]
-    if line_param == []:
-        line_param = zeros((num_line, 7), dtype = int)        
-        for i in range(num_line):
-            line_color = randint(-curtain_param[idx_curtain][9],curtain_param[idx_curtain][9])
-            line_param[i][0] = min(255,max(0,curtain_param[idx_curtain][1] + line_color))
-            line_param[i][1] = min(255,max(0,curtain_param[idx_curtain][2] + line_color))
-            line_param[i][2] = min(255,max(0,curtain_param[idx_curtain][3] + line_color))
-            if (line_param[i][0],line_param[i][1],line_param[i][2]) == (0,0,0):
-                (line_param[i][0],line_param[i][1],line_param[i][2]) = (1,1,1)
-            line_param[i][3] = randint(line_start + line_step*i, line_start + line_step*(i+1))
-            line_param[i][4] = randint(curtain_param[idx_curtain][7], curtain_param[idx_curtain][8])
-            line_param[i][5] = randint(line_step*curtain_param[idx_curtain][5]/100,line_step*curtain_param[idx_curtain][6]/100)     
-            if curtain_param[idx_curtain][13] < 50:        
-                if curtain_param[idx_curtain][10] < 50:            
-                    start_pos = (line_param[i][3],0)
-                    end_pos = (line_param[i][3],600 * line_param[i][4]/100)
-                else:
-                    start_pos = (line_param[i][3],600- 600 *line_param[i][4]/100)
-                    end_pos = (line_param[i][3],600)
-            else:
-                if curtain_param[idx_curtain][10] < 50:            
-                    start_pos = (0,line_param[i][3])
-                    end_pos = (300*line_param[i][4]/100,line_param[i][3])
-                else:
-                    start_pos = (300-300*line_param[i][4]/100,line_param[i][3])
-                    end_pos = (300,line_param[i][3])                   
-            if curtain_param[idx_curtain][14] < 50:
-                pygame.draw.line(line_surf, (line_param[i][0],line_param[i][1],line_param[i][2]), start_pos, end_pos, line_param[i][5])
-            else:
-                line_param[i][6] = randint(1,curtain_param[idx_curtain][15])
-                points = []
-                points.append( start_pos )
-                if curtain_param[idx_curtain][13] < 50: 
-                    tmp = start_pos[1]                     
-                    for j in range(line_param[i][6]):
-                        if curtain_param[idx_curtain][10] < 50: 
-                            tmp = start_pos[1] + (end_pos[1] - start_pos[1]) * 2**(j-line_param[i][6])
-                        else:
-                            tmp = tmp + (end_pos[1] - start_pos[1]) * 2**(-j-1)
-                        if j % 2:
-                            points.append( (line_start + line_step*i +line_param[i][5]/2, tmp))
-                        else:
-                            points.append( (line_start + line_step*(i+1) -line_param[i][5]/2, tmp) )                    
-                else:
-                    tmp = start_pos[0]
-                    for j in range(line_param[i][6]):                        
-                        if curtain_param[idx_curtain][10] < 50: 
-                            tmp = start_pos[0] + (end_pos[0] - start_pos[0]) * 2**(j-line_param[i][6])
-                        else:
-                            tmp = tmp + (end_pos[0] - start_pos[0]) * 2**(-j-1)
-                        if j % 2:
-                            points.append( (tmp,line_start + line_step*i +line_param[i][5]/2))
-                        else:
-                            points.append( (tmp,line_start + line_step*(i+1) -line_param[i][5]/2) )  
-                points.append( end_pos )            
-                pygame.draw.lines(line_surf, (line_param[i][0],line_param[i][1],line_param[i][2]), False, points, line_param[i][5])   
+    if curtain_param[idx_curtain][19]<50:
+        pass
     else:
-        for i in range(num_line):
-            if curtain_param[idx_curtain][13] < 50:        
-                if curtain_param[idx_curtain][10] < 50:            
-                    start_pos = (line_param[i][3],0)
-                    end_pos = (line_param[i][3],600 * line_param[i][4]/100)
-                else:
-                    start_pos = (line_param[i][3],600- 600 *line_param[i][4]/100)
-                    end_pos = (line_param[i][3],600)
+        if curtain_param[idx_curtain][16]<50:
+            x_step = 300 / curtain_param[idx_curtain][17]
+            y_step = 600 / curtain_param[idx_curtain][18]
+            rect_color = (min(255,max(0,curtain_param[idx_curtain][1] + curtain_param[idx_curtain][9])), \
+                          min(255,max(0,curtain_param[idx_curtain][2] + curtain_param[idx_curtain][9])), \
+                          min(255,max(0,curtain_param[idx_curtain][3] + curtain_param[idx_curtain][9])))
+            for i  in range(int(curtain_param[idx_curtain][17])):
+                for j  in range(int(curtain_param[idx_curtain][18])):
+                    if i % 2:
+                        pygame.draw.rect(line_surf, rect_color, [x_step*i, y_step*j, x_step, y_step/2])
+                    else:
+                        pygame.draw.rect(line_surf, rect_color, [x_step*i, y_step*j+y_step/2, x_step, y_step/2])
+        else:
+            if curtain_param[idx_curtain][13]<50:
+                line_size = 300 # v
+                num_line = int(curtain_param[idx_curtain][4])
             else:
-                if curtain_param[idx_curtain][10] < 50:            
-                    start_pos = (0,line_param[i][3])
-                    end_pos = (300*line_param[i][4]/100,line_param[i][3])
-                else:
-                    start_pos = (300-300*line_param[i][4]/100,line_param[i][3])
-                    end_pos = (300,line_param[i][3])
-                    
-            if curtain_param[idx_curtain][14] < 50:
-                pygame.draw.line(line_surf, (line_param[i][0],line_param[i][1],line_param[i][2]), start_pos, end_pos, line_param[i][5])
+                line_size = 600 # h
+                num_line = int(curtain_param[idx_curtain][4]) * 2
+            if curtain_param[idx_curtain][11] < 50:
+                line_start = 0
+                line_end = line_size * curtain_param[idx_curtain][12]/100
             else:
-                points = []
-                points.append( start_pos )
-                if curtain_param[idx_curtain][13] < 50: 
-                    tmp = start_pos[1]                     
-                    for j in range(line_param[i][6]):
-                        if curtain_param[idx_curtain][10] < 50: 
-                            tmp = start_pos[1] + (end_pos[1] - start_pos[1]) * 2**(j-line_param[i][6])
+                line_start = line_size - line_size * curtain_param[idx_curtain][12]/100
+                line_end = line_size                                                  
+            line_range = line_end - line_start + 1                        
+            
+            line_step = line_range/curtain_param[idx_curtain][4]
+            if line_param == []:
+                line_param = zeros((num_line, 7), dtype = int)        
+                for i in range(num_line):
+                    line_color = randint(-curtain_param[idx_curtain][9],curtain_param[idx_curtain][9])
+                    line_param[i][0] = min(255,max(0,curtain_param[idx_curtain][1] + line_color))
+                    line_param[i][1] = min(255,max(0,curtain_param[idx_curtain][2] + line_color))
+                    line_param[i][2] = min(255,max(0,curtain_param[idx_curtain][3] + line_color))
+                    if (line_param[i][0],line_param[i][1],line_param[i][2]) == (0,0,0):
+                        (line_param[i][0],line_param[i][1],line_param[i][2]) = (1,1,1)
+                    line_param[i][3] = randint(line_start + line_step*i, line_start + line_step*(i+1))
+                    line_param[i][4] = randint(curtain_param[idx_curtain][7], curtain_param[idx_curtain][8])
+                    line_param[i][5] = randint(line_step*curtain_param[idx_curtain][5]/100,line_step*curtain_param[idx_curtain][6]/100)     
+                    if curtain_param[idx_curtain][13] < 50:        
+                        if curtain_param[idx_curtain][10] < 50:            
+                            start_pos = (line_param[i][3],0)
+                            end_pos = (line_param[i][3],600 * line_param[i][4]/100)
                         else:
-                            tmp = tmp + (end_pos[1] - start_pos[1]) * 2**(-j-1)
-                        if j % 2:
-                            points.append( (line_start + line_step*i +line_param[i][5]/2, tmp))
+                            start_pos = (line_param[i][3],600- 600 *line_param[i][4]/100)
+                            end_pos = (line_param[i][3],600)
+                    else:
+                        if curtain_param[idx_curtain][10] < 50:            
+                            start_pos = (0,line_param[i][3])
+                            end_pos = (300*line_param[i][4]/100,line_param[i][3])
                         else:
-                            points.append( (line_start + line_step*(i+1) -line_param[i][5]/2, tmp) )                    
+                            start_pos = (300-300*line_param[i][4]/100,line_param[i][3])
+                            end_pos = (300,line_param[i][3])                   
+                    if curtain_param[idx_curtain][14] < 50:
+                        pygame.draw.line(line_surf, (line_param[i][0],line_param[i][1],line_param[i][2]), start_pos, end_pos, line_param[i][5])
+                    else:
+                        line_param[i][6] = randint(1,curtain_param[idx_curtain][15])
+                        points = []
+                        points.append( start_pos )
+                        if curtain_param[idx_curtain][13] < 50: 
+                            tmp = start_pos[1]                     
+                            for j in range(line_param[i][6]):
+                                if curtain_param[idx_curtain][10] < 50: 
+                                    tmp = start_pos[1] + (end_pos[1] - start_pos[1]) * 2**(j-line_param[i][6])
+                                else:
+                                    tmp = tmp + (end_pos[1] - start_pos[1]) * 2**(-j-1)
+                                if j % 2:
+                                    points.append( (line_start + line_step*i +line_param[i][5]/2, tmp))
+                                else:
+                                    points.append( (line_start + line_step*(i+1) -line_param[i][5]/2, tmp) )                    
+                        else:
+                            tmp = start_pos[0]
+                            for j in range(line_param[i][6]):                        
+                                if curtain_param[idx_curtain][10] < 50: 
+                                    tmp = start_pos[0] + (end_pos[0] - start_pos[0]) * 2**(j-line_param[i][6])
+                                else:
+                                    tmp = tmp + (end_pos[0] - start_pos[0]) * 2**(-j-1)
+                                if j % 2:
+                                    points.append( (tmp,line_start + line_step*i +line_param[i][5]/2))
+                                else:
+                                    points.append( (tmp,line_start + line_step*(i+1) -line_param[i][5]/2) )  
+                        points.append( end_pos )            
+                        pygame.draw.lines(line_surf, (line_param[i][0],line_param[i][1],line_param[i][2]), False, points, line_param[i][5])   
+            else:
+                for i in range(num_line):
+                    if curtain_param[idx_curtain][13] < 50:        
+                        if curtain_param[idx_curtain][10] < 50:            
+                            start_pos = (line_param[i][3],0)
+                            end_pos = (line_param[i][3],600 * line_param[i][4]/100)
+                        else:
+                            start_pos = (line_param[i][3],600- 600 *line_param[i][4]/100)
+                            end_pos = (line_param[i][3],600)
+                    else:
+                        if curtain_param[idx_curtain][10] < 50:            
+                            start_pos = (0,line_param[i][3])
+                            end_pos = (300*line_param[i][4]/100,line_param[i][3])
+                        else:
+                            start_pos = (300-300*line_param[i][4]/100,line_param[i][3])
+                            end_pos = (300,line_param[i][3])
+                            
+                    if curtain_param[idx_curtain][14] < 50:
+                        pygame.draw.line(line_surf, (line_param[i][0],line_param[i][1],line_param[i][2]), start_pos, end_pos, line_param[i][5])
+                    else:
+                        points = []
+                        points.append( start_pos )
+                        if curtain_param[idx_curtain][13] < 50: 
+                            tmp = start_pos[1]                     
+                            for j in range(line_param[i][6]):
+                                if curtain_param[idx_curtain][10] < 50: 
+                                    tmp = start_pos[1] + (end_pos[1] - start_pos[1]) * 2**(j-line_param[i][6])
+                                else:
+                                    tmp = tmp + (end_pos[1] - start_pos[1]) * 2**(-j-1)
+                                if j % 2:
+                                    points.append( (line_start + line_step*i +line_param[i][5]/2, tmp))
+                                else:
+                                    points.append( (line_start + line_step*(i+1) -line_param[i][5]/2, tmp) )                    
+                        else:
+                            tmp = start_pos[0]
+                            for j in range(line_param[i][6]):                        
+                                if curtain_param[idx_curtain][10] < 50: 
+                                    tmp = start_pos[0] + (end_pos[0] - start_pos[0]) * 2**(j-line_param[i][6])
+                                else:
+                                    tmp = tmp + (end_pos[0] - start_pos[0]) * 2**(-j-1)
+                                if j % 2:
+                                    points.append( (tmp,line_start + line_step*i + line_param[i][5]/2))
+                                else:
+                                    points.append( (tmp,line_start + line_step*(i+1) - line_param[i][5]/2) )   
+                        points.append( end_pos )            
+                        pygame.draw.lines(line_surf, (line_param[i][0],line_param[i][1],line_param[i][2]), False, points, line_param[i][5])   
+                     
+        line_surf.set_colorkey((0,0,0))
+        line_surf.set_alpha(255) 
+        curtain_surf.blit(line_surf, (0, 0))
+        curtain_surf.blit(pygame.transform.flip(line_surf,True,False), (300, 0))
+        
+        
+    fore_surf = pygame.Surface((img_outside.get_width()/2, img_outside.get_height()))
+    fore_surf.fill((0,0,0))
+    if curtain_param[idx_curtain][20] < 50:
+        pass
+    else:
+        if fore_param == []:
+            fore_param = zeros((curtain_param[idx_curtain][21], 20))
+            for i in range(int(curtain_param[idx_curtain][21])):
+                fore_param[i][0] = randint(101)
+                fore_color = []
+                fore_color.append(randint(-curtain_param[idx_curtain][23],curtain_param[idx_curtain][23]))
+                fore_color.append(randint(-curtain_param[idx_curtain][24],curtain_param[idx_curtain][24]))
+                fore_color.append(randint(-curtain_param[idx_curtain][25],curtain_param[idx_curtain][25]))                
+                fore_param[i][1] = min(255,max(0,curtain_param[idx_curtain][1] + fore_color[0]))
+                fore_param[i][2] = min(255,max(0,curtain_param[idx_curtain][2] + fore_color[1]))
+                fore_param[i][3] = min(255,max(0,curtain_param[idx_curtain][3] + fore_color[2]))
+                if (fore_param[i][1],fore_param[i][2],fore_param[i][3]) == (0,0,0):
+                    (fore_param[i][1],fore_param[i][2],fore_param[i][3]) = (1,1,1)
+                fore_param[i][4] = 300 * randint(curtain_param[idx_curtain][26])/100
+                fore_param[i][5] = 300 * randint(curtain_param[idx_curtain][27],300)/100
+                fore_param[i][6] = 600 * randint(curtain_param[idx_curtain][28])/100
+                fore_param[i][7] = 600 * randint(curtain_param[idx_curtain][29],300)/100
+                fore_param[i][8] = randint(curtain_param[idx_curtain][30]*0.5, curtain_param[idx_curtain][30]*1.5 )
+                fore_param[i][9] = randint(curtain_param[idx_curtain][31]*0.5, curtain_param[idx_curtain][31]*1.5 )
+                fore_param[i][10] = randint(curtain_param[idx_curtain][32]*0.5, curtain_param[idx_curtain][32]*1.5 )
+                fore_w = fore_param[i][5]-fore_param[i][4]
+                fore_h = fore_param[i][7]-fore_param[i][6]
+                if fore_param[i][0] < curtain_param[idx_curtain][22]: # ellipse
+                    for j in range(int(fore_param[i][8])):
+                        for k in range(int(fore_param[i][9])):
+                            pygame.draw.ellipse(fore_surf,(fore_param[i][1],fore_param[i][2],fore_param[i][3]), \
+                                                [fore_param[i][4] + j * fore_w /fore_param[i][8], \
+                                                 fore_param[i][6] + k * fore_h /fore_param[i][9], \
+                                                 fore_w * fore_param[i][10] / 100, \
+                                                 fore_h * fore_param[i][10] / 200 ])
                 else:
-                    tmp = start_pos[0]
-                    for j in range(line_param[i][6]):                        
-                        if curtain_param[idx_curtain][10] < 50: 
-                            tmp = start_pos[0] + (end_pos[0] - start_pos[0]) * 2**(j-line_param[i][6])
-                        else:
-                            tmp = tmp + (end_pos[0] - start_pos[0]) * 2**(-j-1)
-                        if j % 2:
-                            points.append( (tmp,line_start + line_step*i + line_param[i][5]/2))
-                        else:
-                            points.append( (tmp,line_start + line_step*(i+1) - line_param[i][5]/2) )   
-                points.append( end_pos )            
-                pygame.draw.lines(line_surf, (line_param[i][0],line_param[i][1],line_param[i][2]), False, points, line_param[i][5])   
-             
-    line_surf.set_colorkey((0,0,0))
-    line_surf.set_alpha(255) 
-    curtain_surf.blit(line_surf, (0, 0))
-    curtain_surf.blit(pygame.transform.flip(line_surf,True,False), (300, 0))
+                    for j in range(int(fore_param[i][8])):
+                        for k in range(int(fore_param[i][9])):
+                            base_pose = (fore_param[i][4] + j * fore_w /fore_param[i][8],fore_param[i][6] + k * fore_h /fore_param[i][9]);
+                            pygame.draw.polygon(fore_surf,(fore_param[i][1],fore_param[i][2],fore_param[i][3]), \
+                                                [(base_pose[0]+fore_w * fore_param[i][10] / 100,base_pose[1]+fore_h * fore_param[i][10] / 200),\
+                                                 (base_pose[0]+fore_w * fore_param[i][10] / 200,base_pose[1]),\
+                                                 (base_pose[0],base_pose[1]+fore_h * fore_param[i][10] / 400)])
+        else:
+            for i in range(int(curtain_param[idx_curtain][21])):
+                fore_w = fore_param[i][5]-fore_param[i][4]
+                fore_h = fore_param[i][7]-fore_param[i][6]
+                if fore_param[i][0] < curtain_param[idx_curtain][22]: # ellipse
+                    for j in range(int(fore_param[i][8])):
+                        for k in range(int(fore_param[i][9])):
+                            pygame.draw.ellipse(fore_surf,(fore_param[i][1],fore_param[i][2],fore_param[i][3]), \
+                                                [fore_param[i][4] + j * fore_w /fore_param[i][8], \
+                                                 fore_param[i][6] + k * fore_h /fore_param[i][9], \
+                                                 fore_w * fore_param[i][10] / 100, \
+                                                 fore_h * fore_param[i][10] / 200 ])
+                else:
+                    for j in range(int(fore_param[i][8])):
+                        for k in range(int(fore_param[i][9])):
+                            base_pose = (fore_param[i][4] + j * fore_w /fore_param[i][8],fore_param[i][6] + k * fore_h /fore_param[i][9]);
+                            pygame.draw.polygon(fore_surf,(fore_param[i][1],fore_param[i][2],fore_param[i][3]), \
+                                                [(base_pose[0]+fore_w * fore_param[i][10] / 100,base_pose[1]+fore_h * fore_param[i][10] / 200),\
+                                                 (base_pose[0]+fore_w * fore_param[i][10] / 200,base_pose[1]),\
+                                                 (base_pose[0],base_pose[1]+fore_h * fore_param[i][10] / 400)])
+        fore_surf.set_colorkey((0,0,0))
+        fore_surf.set_alpha(255) 
+        curtain_surf.blit(fore_surf, (0, 0))
+        curtain_surf.blit(pygame.transform.flip(fore_surf,True,False), (300, 0))
     
     curtain_surf.blit(mask_curtain, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)  
     curtain_surf.set_colorkey((0,0,0))
@@ -430,29 +518,50 @@ def clac_params():
     if idx_step == 2:          
         for i in range(100):
             curtain_param[i][0] = randint(180) # surf alpha
-            curtain_param[i][1] = randint(255) # background R
-            curtain_param[i][2] = randint(255) # background G
-            curtain_param[i][3] = randint(255) # background B
+            curtain_param[i][1] = randint(256) # background R
+            curtain_param[i][2] = randint(256) # background G
+            curtain_param[i][3] = randint(256) # background B
             
-            curtain_param[i][4] = randint(30) # v line num
-            curtain_param[i][5] = randint(50) # line width min %
+            curtain_param[i][4] = randint(1,30) # v line num
+            curtain_param[i][5] = randint(1,50) # line width min %
             curtain_param[i][6] = randint(51,101) # line width max %
-            curtain_param[i][7] = randint(50) # line long min %
+            curtain_param[i][7] = randint(1,50) # line long min %
             curtain_param[i][8] = randint(51,101) # line long max %
-            curtain_param[i][9] = randint(255) # line R adjust range
+            curtain_param[i][9] = randint(1,200) # background R adjust range
             curtain_param[i][10] = randint(101) # line start %
             curtain_param[i][11] = randint(101) # line range start %
-            curtain_param[i][12] = randint(101) # line range %
+            curtain_param[i][12] = randint(101) # line band %
             curtain_param[i][13] = randint(101) # direction %
             
-            curtain_param[i][14] = randint(101) # line or aalines %
-            curtain_param[i][15] = randint(5,30) # num of points %
+            curtain_param[i][14] = randint(101) # line or lines %
+            curtain_param[i][15] = randint(5,30) # num of points (lines only)%
             
+            curtain_param[i][16] = randint(101) # line or rect %             
+            curtain_param[i][17] = randint(1,20) #  rect num h %  
+            curtain_param[i][18] = randint(1,20) #  rect num v %            
+            curtain_param[i][19] = randint(101) # no or have background %   
+            
+            # pygame.draw.ellipse(DISPLAYSURF, RED, (300, 200, 40, 80), 1)
+            # polygon(Surface, color, pointlist, width=0)
+            curtain_param[i][20] = randint(101) # no or have foreground
+            curtain_param[i][21] = randint(1,20) # kinds of foreground
+            curtain_param[i][22] = randint(101) # rate being ellipse %
+            curtain_param[i][23] = randint(1,200) # foreground R adjust range
+            curtain_param[i][24] = randint(1,200) # foreground G adjust range
+            curtain_param[i][25] = randint(1,200) # foreground B adjust range
+            curtain_param[i][26] = randint(1,50) # start foreground x %
+            curtain_param[i][27] = randint(51,101) # end foreground x %
+            curtain_param[i][28] = randint(1,50) # start foreground y %
+            curtain_param[i][29] = randint(51,101) # end foreground y %
+            curtain_param[i][30] = randint(1,15) #  num h %  
+            curtain_param[i][31] = randint(1,30) #  num v %  
+            curtain_param[i][32] = randint(1,30) #  size % 
             
         
     
 def show_and_score():
     global line_param
+    global fore_param
     generation_start()
     clac_params()
     idx_curtain = 0
@@ -463,6 +572,7 @@ def show_and_score():
                     exit_box()
                 if event.key == pygame.K_RETURN:
                     line_param = []
+                    fore_param = []
                     idx_curtain += 1
         draw_curtain(idx_curtain)
         get_score()        
