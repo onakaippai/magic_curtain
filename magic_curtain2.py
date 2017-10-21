@@ -26,6 +26,7 @@ img_summer = pygame.transform.scale(pygame.image.load(imgpath + 'summer.png'),(h
 img_autumn = pygame.transform.scale(pygame.image.load(imgpath + 'autumn.png'),(height_screen,height_screen))
 img_winter = pygame.transform.scale(pygame.image.load(imgpath + 'winter.png'),(height_screen,height_screen))
 img_curtain = pygame.transform.scale(pygame.image.load(imgpath + 'curtain.jpg'),(height_screen,height_screen))
+img_heart = pygame.transform.scale(pygame.image.load(imgpath + 'heart2.png'),(50,50))
 mask_wall = pygame.transform.scale(pygame.image.load(imgpath + 'wall_mask.png'),(height_screen,height_screen))
 mask_window = pygame.transform.scale(pygame.image.load(imgpath + 'window_mask.png'),(height_screen,height_screen))
 mask_curtain = pygame.transform.scale(pygame.image.load(imgpath + 'curtain_mask2.png'),(height_screen,height_screen))
@@ -48,8 +49,10 @@ def welcome():
     while True: 
         for event in pygame.event.get():
             pass
+        now = pygame.time.get_ticks()
+        screen.fill(white)
         wel_surf = pygame.Surface((width_screen, height_screen))
-        wel_surf.fill(white)
+        wel_surf.fill((0,0,0), special_flags=pygame.BLEND_RGBA_SUB)        
         
         textSurf, textRect = text_objects('Welcome to','comicsansms',100, black)
         textRect.center = (500,200)
@@ -59,10 +62,16 @@ def welcome():
         textRect.center = (500,400)
         wel_surf.blit(textSurf,textRect) 
         
+        wel_surf.set_colorkey((0,0,0))
+#        wel_surf.set_alpha(255)
+        if (now - start) < 1250: 
+            wel_surf.set_alpha((now - start)/5)  
+        if (now - start) > 3750: 
+            wel_surf.set_alpha(255-(now - start - 3750)/5)   
         screen.blit(wel_surf,(0,0))
         pygame.display.update() 
-        now = pygame.time.get_ticks()
-        if (now - start) > 3000:          
+        
+        if (now - start) > 5000:          
             break       
       
 
@@ -484,8 +493,57 @@ def draw_curtain(idx_curtain):
     curtain_surf.set_alpha(curtain_param[idx_curtain][0]) 
     screen.blit(curtain_surf, (0,0))
     
-def get_score():
-    pass
+def get_score(idx_curtain):
+    global line_param
+    global fore_param
+#    global idx_curtain
+#    for event in pygame.event.get(): 
+#        pass
+        #print(pygame.mouse.get_pos())
+    (mouse_x, mouse_y) = pygame.mouse.get_pos()    
+    surf_score = pygame.Surface((400, 600))
+    surf_score.fill(white)
+    pygame.draw.line(surf_score,black,(150,150),(150,550),10)
+    pygame.draw.line(surf_score,black,(130,145),(170,145),10)
+    pygame.draw.line(surf_score,black,(130,555),(170,555),10)
+    
+    textSurf, textRect = text_objects('please score the curtain','comicsansms',30, gray)
+    textRect.center = (200,30)
+    surf_score.blit(textSurf,textRect)
+    textSurf, textRect = text_objects('by clicking on the rule','comicsansms',30, gray)
+    textRect.center = (200,80)
+    surf_score.blit(textSurf,textRect)
+    
+    textSurf, textRect = text_objects('100','comicsansms',50, black)
+    textRect.center = (70,145)
+    surf_score.blit(textSurf,textRect)
+    
+    textSurf, textRect = text_objects('   0','comicsansms',50, black)
+    textRect.center = (75,555)
+    surf_score.blit(textSurf,textRect)
+    
+    for i in range(4):
+        pygame.draw.line(surf_score,black,(140,230+80*i),(160,230+80*i),2)
+        textSurf, textRect = text_objects(str(100-(i+1)*20),'comicsansms',20, black)
+        textRect.center = (95,230+80*i)
+        surf_score.blit(textSurf,textRect)
+        
+    if 730<mouse_x<770 and 149<mouse_y<551:
+        surf_score.blit(img_heart,(125,mouse_y-25))          
+        textSurf, textRect = text_objects(str(100 - (mouse_y-150)/4),'comicsansms',70, black)
+        textRect.center = (290,mouse_y)
+        surf_score.blit(textSurf,textRect)
+        if pygame.mouse.get_pressed()[0]:
+            line_param = []
+            fore_param = []
+            return idx_curtain + 1
+    
+            
+#    surf_score.set_colorkey((0,0,0))
+#    surf_score.set_alpha(255)    
+    screen.blit(surf_score,(600,0))
+    return idx_curtain
+
 
 def generation_start():
     start = pygame.time.get_ticks()
@@ -503,12 +561,12 @@ def generation_start():
         
         pygame.display.update() 
         now = pygame.time.get_ticks()
-        if (now - start) > 3000:          
+        if (now - start) > 2000:          
             break   
 
 def generation_end():
-    pass
-
+    pass    
+            
 def clac_params():
     seed(idx_step)
     # whole curtain
@@ -559,23 +617,22 @@ def clac_params():
             
         
     
-def show_and_score():
-    global line_param
-    global fore_param
+def show_and_score():    
     generation_start()
     clac_params()
     idx_curtain = 0
     while True:
-        for event in pygame.event.get():                      
+        for event in pygame.event.get(): 
+            #print(pygame.mouse.get_pos())                     
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     exit_box()
-                if event.key == pygame.K_RETURN:
-                    line_param = []
-                    fore_param = []
-                    idx_curtain += 1
+#                if event.key == pygame.K_RETURN:
+#                    line_param = []
+#                    fore_param = []
+#                    idx_curtain += 1
         draw_curtain(idx_curtain)
-        get_score()        
+        idx_curtain = get_score(idx_curtain)        
         pygame.display.update()
     generation_end()
 
