@@ -32,9 +32,10 @@ mask_window = pygame.transform.scale(pygame.image.load(imgpath + 'window_mask.pn
 mask_curtain = pygame.transform.scale(pygame.image.load(imgpath + 'curtain_mask2.png'),(height_screen,height_screen))
 
 season_or_wall = True
-curtain_param = zeros((100,100))
+curtain_param = zeros((30,33))
 line_param = []
 fore_param = []
+curtain_score = [] 
 idx_season = 0
 idx_wall = 0
 idx_step = 0
@@ -493,7 +494,7 @@ def draw_curtain(idx_curtain):
     curtain_surf.set_alpha(curtain_param[idx_curtain][0]) 
     screen.blit(curtain_surf, (0,0))
     
-def get_score(idx_curtain):
+def get_score(idx_curtain,curtain_score, click_flag):
     global line_param
     global fore_param
 #    global idx_curtain
@@ -507,10 +508,16 @@ def get_score(idx_curtain):
     pygame.draw.line(surf_score,black,(130,145),(170,145),10)
     pygame.draw.line(surf_score,black,(130,555),(170,555),10)
     
-    textSurf, textRect = text_objects('please score the curtain','comicsansms',30, gray)
+    no_str = 'please score No.'+str(idx_curtain+1)+' curtain'
+    textSurf, textRect = text_objects(no_str,'comicsansms',25, black)
     textRect.center = (200,30)
     surf_score.blit(textSurf,textRect)
-    textSurf, textRect = text_objects('by clicking on the rule','comicsansms',30, gray)
+    
+    if idx_step == 2:
+        num_total = 30
+    else:
+        num_total = 10
+    textSurf, textRect = text_objects('by clicking on the rule' + '(of ' +str(num_total) +')','comicsansms',25, black)
     textRect.center = (200,80)
     surf_score.blit(textSurf,textRect)
     
@@ -534,15 +541,21 @@ def get_score(idx_curtain):
         textRect.center = (290,mouse_y)
         surf_score.blit(textSurf,textRect)
         if pygame.mouse.get_pressed()[0]:
-            line_param = []
-            fore_param = []
-            return idx_curtain + 1
+            if click_flag:
+                click_flag = 0
+            else:
+                click_flag = 1
+                line_param = []
+                fore_param = []
+                curtain_score.append(100 - (mouse_y-150)/4)
+    #            print(curtain_score)
+                return (idx_curtain + 1,curtain_score,click_flag)
     
             
 #    surf_score.set_colorkey((0,0,0))
 #    surf_score.set_alpha(255)    
     screen.blit(surf_score,(600,0))
-    return idx_curtain
+    return (idx_curtain,curtain_score,click_flag)
 
 
 def generation_start():
@@ -551,13 +564,26 @@ def generation_start():
         for event in pygame.event.get():
             pass
         screen.fill(white)
-        textSurf, textRect = text_objects('preparing','comicsansms',100, black)
-        textRect.center = (500,200)
-        screen.blit(textSurf,textRect)
-        if idx_step == 2:
-            textSurf, textRect = text_objects('1st generation ...','comicsansms',100, black)
-        textRect.center = (500,400)
-        screen.blit(textSurf,textRect)  
+        if idx_step == 7:
+            textSurf, textRect = text_objects('getting result','comicsansms',100, black)
+            textRect.center = (500,300)
+            screen.blit(textSurf,textRect)            
+        else:                
+            textSurf, textRect = text_objects('preparing','comicsansms',100, black)
+            textRect.center = (500,200)
+            screen.blit(textSurf,textRect)
+            if idx_step == 2:
+                textSurf, textRect = text_objects('1st generation ...','comicsansms',100, black)
+            elif idx_step == 3:
+                textSurf, textRect = text_objects('2nd generation ...','comicsansms',100, black)
+            elif idx_step == 4:
+                textSurf, textRect = text_objects('3rd generation ...','comicsansms',100, black)
+            elif idx_step == 5:
+                textSurf, textRect = text_objects('4th generation ...','comicsansms',100, black)
+            elif idx_step == 6:
+                textSurf, textRect = text_objects('5th generation ...','comicsansms',100, black)
+            textRect.center = (500,400)
+            screen.blit(textSurf,textRect)  
         
         pygame.display.update() 
         now = pygame.time.get_ticks()
@@ -565,16 +591,41 @@ def generation_start():
             break   
 
 def generation_end():
-    pass    
+    start = pygame.time.get_ticks()
+    while True: 
+        for event in pygame.event.get():
+            pass
+        screen.fill(white)
+        textSurf, textRect = text_objects('calculating the results','comicsansms',60, black)
+        textRect.center = (500,200)
+        screen.blit(textSurf,textRect)
+        if idx_step == 2:
+            textSurf, textRect = text_objects('of 1st generation ...','comicsansms',60, black)
+        elif idx_step == 3:
+            textSurf, textRect = text_objects('of 2nd generation ...','comicsansms',60, black)
+        elif idx_step == 4:
+            textSurf, textRect = text_objects('of 3rd generation ...','comicsansms',60, black)
+        elif idx_step == 5:
+            textSurf, textRect = text_objects('of 4th generation ...','comicsansms',60, black)
+        elif idx_step == 6:
+            textSurf, textRect = text_objects('of 5th generation ...','comicsansms',60, black)
+        textRect.center = (500,400)
+        screen.blit(textSurf,textRect)  
+        
+        pygame.display.update() 
+        now = pygame.time.get_ticks()
+        if (now - start) > 2000:          
+            break      
             
-def clac_params():
-    seed(idx_step)
+def clac_params(curtain_score):
+    seed(pygame.time.get_ticks())
+    global curtain_param
     # whole curtain
     #
     # line(Surface, color, start_pos, end_pos, width=1)
     # aalines(Surface, color, closed, pointlist, blend=1)
     if idx_step == 2:          
-        for i in range(100):
+        for i in range(30):
             curtain_param[i][0] = randint(180) # surf alpha
             curtain_param[i][1] = randint(256) # background R
             curtain_param[i][2] = randint(256) # background G
@@ -613,14 +664,80 @@ def clac_params():
             curtain_param[i][29] = randint(51,101) # end foreground y %
             curtain_param[i][30] = randint(1,15) #  num h %  
             curtain_param[i][31] = randint(1,30) #  num v %  
-            curtain_param[i][32] = randint(1,30) #  size % 
+            curtain_param[i][32] = randint(1,30) #  size %
+    else:
+        curtain_rank = sorted(curtain_score,reverse=True)
+        parents = zeros((3,33))
+        parents[0] = curtain_param[curtain_score.index(curtain_rank[0])]
+        parents[1] = curtain_param[curtain_score.index(curtain_rank[1])]
+        parents[2] = curtain_param[curtain_score.index(curtain_rank[2])]
+        
+        cross_rate = 0.6
+        mutate_rate = 0.15
+        curtain_param = zeros((10,33))
+        
+        num_rand = rand(10,33)
+        num_cross = num_rand < cross_rate
+        num_nocross = ~num_cross
+        
+        num_rand = rand(10,33)
+        num_mutate = num_rand < mutate_rate
+        num_nomutate = ~num_mutate 
+        
+        for i in range(10):
+            if i < 3:
+                curtain_param[i] = parents[i]
+            else:
+                curtain_param[i] = (parents[0]*0.5 + parents[1]*0.5)*num_cross[i] + parents[0] * num_nocross[i]            
+                curtain_param[i][0] = randint(180)*num_mutate[i][0] + curtain_param[i][0]*num_nomutate[i][0] # surf alpha
+                curtain_param[i][1] = randint(256)*num_mutate[i][1] + curtain_param[i][1]*num_nomutate[i][1] # background R
+                curtain_param[i][2] = randint(256)*num_mutate[i][2] + curtain_param[i][2]*num_nomutate[i][2] # background G
+                curtain_param[i][3] = randint(256)*num_mutate[i][3] + curtain_param[i][3]*num_nomutate[i][3] # background B
+                
+                curtain_param[i][4] = randint(1,30)*num_mutate[i][4] + curtain_param[i][4]*num_nomutate[i][4] # v line num
+                curtain_param[i][5] = randint(1,50)*num_mutate[i][5] + curtain_param[i][5]*num_nomutate[i][5] # line width min %
+                curtain_param[i][6] = randint(51,101)*num_mutate[i][6] + curtain_param[i][6]*num_nomutate[i][6] # line width max %
+                curtain_param[i][7] = randint(1,50)*num_mutate[i][7] + curtain_param[i][7]*num_nomutate[i][7] # line long min %
+                curtain_param[i][8] = randint(51,101)*num_mutate[i][8] + curtain_param[i][8]*num_nomutate[i][8] # line long max %
+                curtain_param[i][9] = randint(1,200)*num_mutate[i][9] + curtain_param[i][9]*num_nomutate[i][9] # background R adjust range
+                curtain_param[i][10] = randint(101)*num_mutate[i][10] + curtain_param[i][10]*num_nomutate[i][10] # line start %
+                curtain_param[i][11] = randint(101)*num_mutate[i][11] + curtain_param[i][11]*num_nomutate[i][11] # line range start %
+                curtain_param[i][12] = randint(101)*num_mutate[i][12] + curtain_param[i][12]*num_nomutate[i][12] # line band %
+                curtain_param[i][13] = randint(101)*num_mutate[i][13] + curtain_param[i][13]*num_nomutate[i][13] # direction %
+                
+                curtain_param[i][14] = randint(101)*num_mutate[i][14] + curtain_param[i][14]*num_nomutate[i][14] # line or lines %
+                curtain_param[i][15] = randint(5,30)*num_mutate[i][15] + curtain_param[i][15]*num_nomutate[i][15] # num of points (lines only)%
+                
+                curtain_param[i][16] = randint(101)*num_mutate[i][16] + curtain_param[i][16]*num_nomutate[i][16] # line or rect %             
+                curtain_param[i][17] = randint(1,20)*num_mutate[i][17] + curtain_param[i][17]*num_nomutate[i][17] #  rect num h %  
+                curtain_param[i][18] = randint(1,20)*num_mutate[i][18] + curtain_param[i][18]*num_nomutate[i][18] #  rect num v %            
+                curtain_param[i][19] = randint(101)*num_mutate[i][19] + curtain_param[i][19]*num_nomutate[i][19] # no or have background %   
+                
+                # pygame.draw.ellipse(DISPLAYSURF, RED, (300, 200, 40, 80), 1)
+                # polygon(Surface, color, pointlist, width=0)
+                curtain_param[i][20] = randint(101)*num_mutate[i][20] + curtain_param[i][20]*num_nomutate[i][20] # no or have foreground
+                curtain_param[i][21] = randint(1,20)*num_mutate[i][21] + curtain_param[i][21]*num_nomutate[i][21] # kinds of foreground
+                curtain_param[i][22] = randint(101)*num_mutate[i][22] + curtain_param[i][22]*num_nomutate[i][22] # rate being ellipse %
+                curtain_param[i][23] = randint(1,200)*num_mutate[i][23] + curtain_param[i][23]*num_nomutate[i][23] # foreground R adjust range
+                curtain_param[i][24] = randint(1,200)*num_mutate[i][24] + curtain_param[i][24]*num_nomutate[i][24] # foreground G adjust range
+                curtain_param[i][25] = randint(1,200)*num_mutate[i][25] + curtain_param[i][25]*num_nomutate[i][25] # foreground B adjust range
+                curtain_param[i][26] = randint(1,50)*num_mutate[i][26] + curtain_param[i][26]*num_nomutate[i][26] # start foreground x %
+                curtain_param[i][27] = randint(51,101)*num_mutate[i][27] + curtain_param[i][27]*num_nomutate[i][27] # end foreground x %
+                curtain_param[i][28] = randint(1,50)*num_mutate[i][28] + curtain_param[i][28]*num_nomutate[i][28] # start foreground y %
+                curtain_param[i][29] = randint(51,101)*num_mutate[i][29] + curtain_param[i][29]*num_nomutate[i][29] # end foreground y %
+                curtain_param[i][30] = randint(1,15)*num_mutate[i][30] + curtain_param[i][30]*num_nomutate[i][30] #  num h %  
+                curtain_param[i][31] = randint(1,30)*num_mutate[i][31] + curtain_param[i][31]*num_nomutate[i][31] #  num v %  
+                curtain_param[i][32] = randint(1,30)*num_mutate[i][32] + curtain_param[i][32]*num_nomutate[i][32] #  size %
+            
             
         
     
-def show_and_score():    
+def show_and_score(curtain_score):  
+    idx_curtain = 0    
     generation_start()
-    clac_params()
-    idx_curtain = 0
+    clac_params(curtain_score)
+    curtain_score = []
+    click_flag = 0
     while True:
         for event in pygame.event.get(): 
             #print(pygame.mouse.get_pos())                     
@@ -632,9 +749,52 @@ def show_and_score():
 #                    fore_param = []
 #                    idx_curtain += 1
         draw_curtain(idx_curtain)
-        idx_curtain = get_score(idx_curtain)        
+        (idx_curtain, curtain_score,click_flag) = get_score(idx_curtain,curtain_score, click_flag)        
         pygame.display.update()
+        if idx_curtain == 30 and idx_step == 2:            
+            break       
+        elif idx_curtain == 10 and idx_step > 2:
+            break
     generation_end()
+    return curtain_score
+
+
+def show_res(curtain_score):    
+    global curtain_param
+    global line_param
+    global fore_param
+    generation_start()
+    curtain_rank = sorted(curtain_score,reverse=True)
+    res = zeros((2,33))
+    res[0] = curtain_param[curtain_score.index(curtain_rank[0])]
+    res[1] = curtain_param[curtain_score.index(curtain_rank[1])]
+    curtain_param = res
+    save_flag = 1
+    line_param = []
+    fore_param = []
+    while True:
+        for event in pygame.event.get(): 
+            #print(pygame.mouse.get_pos())                     
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    exit_box()
+        draw_curtain(0)
+        textSurf, textRect = text_objects('I guess you like this.','comicsansms',30, black)
+        textRect.center = (800,200)
+        screen.blit(textSurf,textRect)
+        textSurf, textRect = text_objects('And the curtain image','comicsansms',30, black)
+        textRect.center = (800,300)
+        screen.blit(textSurf,textRect)
+        textSurf, textRect = text_objects(' has been saved.','comicsansms',30, black)
+        textRect.center = (800,400)
+        screen.blit(textSurf,textRect)
+        pygame.display.update()    
+        if save_flag:
+            pygame.image.save(screen,'res.png')
+            save_flag = 0
+            
+    
+    
 
 while True:
     if idx_step == 0:
@@ -645,8 +805,8 @@ while True:
         idx_step = 2
     elif idx_step == 7:
         # 5 generation
-        break
+        show_res(curtain_score)
     else:
-        show_and_score()
+        curtain_score = show_and_score(curtain_score)
         idx_step += 1 
-    pygame.display.update()
+    #pygame.display.update()
