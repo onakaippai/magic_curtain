@@ -2,15 +2,18 @@ import os
 import pygame
 from numpy import *
 from numpy.random import *
+from ga_class import *
 
 pygame.init()
+pygame.font.init()
 
 class mc_class:
     
     
     def __init__(self):
         self.name         = 'Magic Curtain'        
-        self.root_path    = os.path.abspath('..')      
+        self.root_path    = os.path.abspath('..')  
+        self.flag_exit    = False
         self.size_screen  = (1000, 600) # [width, height]
         self.size_curtain = (600, 600)  # [width, height]           
         pygame.display.set_caption(self.name)
@@ -69,6 +72,8 @@ class mc_class:
         return surf_text, surf_text.get_rect()
         
     def show_message(self):
+        if self.idx_step == 0 and ~self.is_start:
+            return
         # all message scene
         time_start = pygame.time.get_ticks()
         while True: 
@@ -123,10 +128,8 @@ class mc_class:
                     if event.key == pygame.K_RIGHT:
                         flag_exit = False 
                     if event.key == pygame.K_RETURN:
-                        if flag_exit:
-                            pygame.quit()
-                        else:
-                            return       
+                        self.flag_exit = flag_exit
+                        return
             surf_exit = pygame.Surface((500, 300))
             surf_exit.fill(self.color['black'])
             pygame.draw.rect(surf_exit, self.color['white'], [10, 10, 480, 280])        
@@ -174,6 +177,8 @@ class mc_class:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.exit_box()
+                        if self.flag_exit:
+                            return
                     if event.key == pygame.K_LEFT:
                         flag_season = True
                     if event.key == pygame.K_RIGHT:
@@ -266,4 +271,15 @@ class mc_class:
             pygame.display.update()
             
             
+    def score_curtain(self):
+        if self.idx_step == 1:
+            seed(pygame.time.get_ticks())
+            self.ga = ga_class()
+        else:
+            self.ga.now_generation += 1
+            self.ga.num_curtain = 10
+        idx_curtain = 0
+        while idx_curtain < self.ga.num_curtain:
+            self.show_curtain(idx_curtain)
+            idx_curtain = self.get_score(idx_curtain)
             
