@@ -16,7 +16,7 @@ while True:
     mc.is_start = False
     mc.show_message()
     mc.idx_step += 1
-    if mc.ga.now_generation > mc.ga.num_gen:
+    if mc.ga.now_generation > mc.ga.num_generation:
         mc.flag_finish = True
         
 pygame.quit()
