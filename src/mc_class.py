@@ -273,7 +273,7 @@ class mc_class:
             pygame.display.update()
             
             
-    def init_create_show_params(self,curtain):
+    def create_show_params(self,curtain):
         params = {}
         # whole surface
         params['surf_alpha'] = curtain['surf_alpha']
@@ -527,13 +527,13 @@ class mc_class:
         self.ga.scores = []
         self.screen.fill(self.color['white'])        
         for idx_curtain in range(self.ga.num_curtain):
-            show_params = self.init_create_show_params(self.ga.curtains[idx_curtain])            
+            show_params = self.create_show_params(self.ga.curtains[idx_curtain])            
             flag_click_enable = False
             time_start = pygame.time.get_ticks()
             while True:
                 time_now = pygame.time.get_ticks()
                 if not flag_click_enable:
-                    if time_now - time_start > 200:
+                    if time_now - time_start > 300:
                         flag_click_enable = True
                 for event in pygame.event.get():                      
                     if event.type == pygame.KEYDOWN:
@@ -551,7 +551,7 @@ class mc_class:
     def show_result(self):
         self.ga.num_curtain = 1
         self.ga.generate_curtains()
-        show_params = self.init_create_show_params(self.ga.curtains[0])
+        show_params = self.create_show_params(self.ga.curtains[0])
         flag_save = True
         while True:
             for event in pygame.event.get():                      

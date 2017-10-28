@@ -58,17 +58,13 @@ class ga_class:
             self.cross_rate = 0.6
             self.mutate_rate = 0.15
             for i in range(self.num_curtain):
-                self.curtains.append(self.create_random_params())
-#                self.curtains[i] = self.create_random_params()                
+                self.curtains.append(self.create_random_params())          
         else: 
             curtain_rank = sorted(self.scores, reverse=True)
             parents = []
             parents.append(self.curtains[self.scores.index(curtain_rank[0])])
             parents.append(self.curtains[self.scores.index(curtain_rank[1])])
             parents.append(self.curtains[self.scores.index(curtain_rank[2])])
-#            parents[0] = self.curtains[self.scores.index(curtain_rank[0])]
-#            parents[1] = self.curtains[self.scores.index(curtain_rank[1])]
-#            parents[2] = self.curtains[self.scores.index(curtain_rank[2])] 
             self.curtains = []
             for i in range(self.num_curtain):
                 if i < 3:
