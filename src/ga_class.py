@@ -54,21 +54,27 @@ class ga_class:
      
     def generate_curtains(self):
         if self.now_generation == 1: 
+            self.curtains = []
+            self.cross_rate = 0.6
+            self.mutate_rate = 0.15
             for i in range(self.num_curtain):
-                self.curtains[i] = self.create_random_params()
-                self.cross_rate = 0.6
-                self.mutate_rate = 0.15
+                self.curtains.append(self.create_random_params())
+#                self.curtains[i] = self.create_random_params()                
         else: 
             curtain_rank = sorted(self.scores, reverse=True)
             parents = []
-            parents[0] = self.curtains[self.scores.index(curtain_rank[0])]
-            parents[1] = self.curtains[self.scores.index(curtain_rank[1])]
-            parents[2] = self.curtains[self.scores.index(curtain_rank[2])] 
+            parents.append(self.curtains[self.scores.index(curtain_rank[0])])
+            parents.append(self.curtains[self.scores.index(curtain_rank[1])])
+            parents.append(self.curtains[self.scores.index(curtain_rank[2])])
+#            parents[0] = self.curtains[self.scores.index(curtain_rank[0])]
+#            parents[1] = self.curtains[self.scores.index(curtain_rank[1])]
+#            parents[2] = self.curtains[self.scores.index(curtain_rank[2])] 
+            self.curtains = []
             for i in range(self.num_curtain):
                 if i < 3:
-                    self.curtains[i] = parents[i]
+                    self.curtains.append(parents[i])
                 else:
-                    self.curtains[i] = self.create_random_params()
+                    self.curtains.append(self.create_random_params())
                     for j in range(self.num_params):
                         if rand() > self.mutate_rate:
                             if rand() > self.cross_rate:
@@ -94,9 +100,9 @@ class ga_class:
         # line(or lines) pattern
         params['line_num']                  = randint(1,30)
         params['line_width_min']            = randint(1,50)   # (%)
-        params['line_width_max']            = randint(51,101) # (%)
+        params['line_width_max']            = randint(51,100) # (%)
         params['line_length_min']           = randint(1,50)   # (%)
-        params['line_length_max']           = randint(51,101) # (%)
+        params['line_length_max']           = randint(51,100) # (%)
         params['line_direction']            = randint(101)    # horizontal or vertical (%)
         params['line_start_side']           = randint(101)    # small side or large side (%)
         params['line_position']             = randint(101)    # start position (%)
@@ -111,10 +117,10 @@ class ga_class:
         params['fore_adjust_range_g']       = randint(1,200)
         params['fore_adjust_range_b']       = randint(1,200)
         params['fore_h_start_lim']          = randint(1,50)   # upper limit of start (horizontal direction) (%)
-        params['fore_h_end_lim']            = randint(51,101) # lower limit of end (horizontal direction) (%)
+        params['fore_h_end_lim']            = randint(51,100) # lower limit of end (horizontal direction) (%)
         params['fore_v_start_lim']          = randint(1,50)   # upper limit of start (vertical direction) (%)
-        params['fore_v_end_lim']            = randint(51,101) # lower limit of end (vertical direction) (%)
+        params['fore_v_end_lim']            = randint(51,100) # lower limit of end (vertical direction) (%)
         params['fore_h_num_base']           = randint(1,15)   # number base of patterns (horizontal direction)
         params['fore_v_num_base']           = randint(1,15)   # number base of patterns (vertical direction)
-        params['fore_pattern_size_base']    = randint(30)     # is related to distribution area size  (%)
+        params['fore_pattern_size_base']    = randint(1,30)   # is related to distribution area size  (%)
         return params       

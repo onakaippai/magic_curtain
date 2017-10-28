@@ -72,13 +72,13 @@ class mc_class:
         return surf_text, surf_text.get_rect()
         
     def show_message(self):
-        if self.idx_step == 0 and ~self.is_start:
-            print(self.idx_step)
-            print(~self.is_start)
+        if self.idx_step == 0 and not self.is_start:
             return
         # all message scene
         time_start = pygame.time.get_ticks()
         while True: 
+            for event in pygame.event.get():
+                pass
             now_time = pygame.time.get_ticks()
             self.screen.fill(self.color['white']) 
             surf_screen = pygame.Surface((self.size_screen[0],self.size_screen[1]))
@@ -319,7 +319,11 @@ class mc_class:
             line_range_start = curtain_range * ( 1 - curtain['line_range'] / 100 )
             line_range_end = curtain_range
         line_range = line_range_end - line_range_start + 1
-        line_step = line_range / params['line_num']    
+        line_step = line_range / params['line_num']
+        if curtain['line_or_lines'] < 50:
+            params['line_or_lines'] = False
+        else:
+            params['line_or_lines'] = True
         params['line'] = []                                                
         for i in range(params['line_num']):            
             params['line'].append([]) 
@@ -348,12 +352,12 @@ class mc_class:
                 else:
                     params['line'][i]['start_point'] = ( line_pos_bias, 0 )
                     params['line'][i]['end_point'] = ( line_pos_bias, 600 * line_length / 100 )
-                params['line'][i]['turning_points'] = randint(1,curtain['lines_turning_points'])
+            params['line'][i]['turning_points'] = randint(1,curtain['lines_turning_points'])
         # foreground
-        if curtain['fore_heightave'] < 50:
-            params['fore_heightave'] = False
+        if curtain['fore_have'] < 50:
+            params['fore_have'] = False
         else:
-            params['fore_heightave'] = True
+            params['fore_have'] = True
         params['fore_kinds'] = curtain['fore_kinds']
         params['fore'] = []  
         for i in range(params['fore_kinds']):            
@@ -365,27 +369,28 @@ class mc_class:
             fore_color.append(randint( -curtain['fore_adjust_range_g'], curtain['fore_adjust_range_g']))
             fore_color.append(randint( -curtain['fore_adjust_range_b'], curtain['fore_adjust_range_b']))
             params['fore'][i]['color'] = (\
-                  min(255,max(0, curtain['back_r'] + fore_color[0])),\
-                  min(255,max(0, curtain['back_g'] + fore_color[1])),\
-                  min(255,max(0, curtain['back_b'] + fore_color[2])))
+                  int(min(255,max(0, curtain['back_r'] + fore_color[0]))),\
+                  int(min(255,max(0, curtain['back_g'] + fore_color[1]))),\
+                  int(min(255,max(0, curtain['back_b'] + fore_color[2]))))
             if params['fore'][i]['color'] == (0, 0, 0):
                 params['fore'][i]['color'] = (1, 1, 1)
-            params['fore'][i]['h_start'] = 300 * randint( 1, curtain['fore_height_start_lim'] )/100
-            params['fore'][i]['h_end'] = 300 * randint( curtain['fore_height_end_lim'], 100 )/100   
-            params['fore'][i]['v_start'] = 300 * randint( 1, curtain['fore_v_start_lim'] )/100
-            params['fore'][i]['v_end'] = 300 * randint( curtain['fore_v_end_lim'], 100 )/100
-            params['fore'][i]['h_num'] = randint( curtain['fore_height_num_base'] * 0.5, curtain['fore_height_num_base'] * 1.5 )     
+            params['fore'][i]['h_start'] = 300 * randint( curtain['fore_h_start_lim'] )/100
+            params['fore'][i]['h_end'] = 300 * randint( curtain['fore_h_end_lim'], 100 )/100   
+            params['fore'][i]['v_start'] = 600 * randint( curtain['fore_v_start_lim'] )/100
+            params['fore'][i]['v_end'] = 600 * randint( curtain['fore_v_end_lim'], 100 )/100
+            params['fore'][i]['h_num'] = randint( curtain['fore_h_num_base'] * 0.5, curtain['fore_h_num_base'] * 1.5 )     
             params['fore'][i]['v_num'] = randint( curtain['fore_v_num_base'] * 0.5, curtain['fore_v_num_base'] * 1.5 ) 
             params['fore'][i]['size'] = randint( curtain['fore_pattern_size_base'] * 0.5, curtain['fore_pattern_size_base'] * 1.5 )  
         return params
       
     
-    def show_curtain(self, show_params):        
+    def show_curtain(self, show_params): 
+        self.screen.blit(self.img_curtain, (0,0))
         self.screen.blit(self.surf_window, (0,0))
         self.screen.blit(self.surf_wall, (0,0))        
-        surf_curtain = pygame.Surface((self.score_curtain[0], self.score_curtain[1]))
+        surf_curtain = pygame.Surface((self.size_curtain[0], self.size_curtain[1]))
         surf_curtain.fill(show_params['back_color'])
-        surf_pattern = pygame.Surface((self.score_curtain[0]/2, self.score_curtain[1]))
+        surf_pattern = pygame.Surface((self.size_curtain[0]/2, self.size_curtain[1]))
         surf_pattern.fill(self.color_key)
         # draw background
         if show_params['back_have_pattern']:
@@ -403,45 +408,45 @@ class mc_class:
             else:
                 for i in range(int(show_params['line_num'])):
                     if show_params['line_or_lines']:
-                        pygame.draw.line(surf_pattern, show_params['line_num'][i]['color'],\
-                                         show_params['line_num'][i]['start_point'],\
-                                         show_params['line_num'][i]['end_point'],\
-                                         show_params['line_num'][i]['width'])
+                        pygame.draw.line(surf_pattern, show_params['line'][i]['color'],\
+                                         show_params['line'][i]['start_point'],\
+                                         show_params['line'][i]['end_point'],\
+                                         show_params['line'][i]['width'])
                     else:
                         turning_points = []
-                        turning_points.append( show_params['line_num'][i]['start_point'] ) 
+                        turning_points.append( show_params['line'][i]['start_point'] ) 
                         if show_params['line_direction']:
-                            tmp = show_params['line_num'][i]['start_point'][0]
+                            tmp = show_params['line'][i]['start_point'][0]
                             for j in range(show_params['line'][i]['turning_points']):                        
                                 if show_params['line_start_side']: 
-                                    tmp = tmp + (show_params['line_num'][i]['end_point'][0] - show_params['line_num'][i]['start_point'][0]) * 2**(-j-1)                                    
+                                    tmp = tmp + (show_params['line'][i]['end_point'][0] - show_params['line'][i]['start_point'][0]) * 2**(-j-1)                                    
                                 else:
-                                    tmp = show_params['line_num'][i]['start_point'][0] +\
-                                          (show_params['line_num'][i]['end_point'][0] - show_params['line_num'][i]['start_point'][0]) *\
+                                    tmp = show_params['line'][i]['start_point'][0] +\
+                                          (show_params['line'][i]['end_point'][0] - show_params['line'][i]['start_point'][0]) *\
                                            2**(j-show_params['line'][i]['turning_points'])
                                 if j % 2:
-                                    turning_points.append( (tmp, show_params['line_num'][i]['start_point'][1] - show_params['line_num'][i]['width'] / 2))
+                                    turning_points.append( (tmp, show_params['line'][i]['start_point'][1] - show_params['line'][i]['width'] / 2))
                                 else:
-                                    turning_points.append( (tmp, show_params['line_num'][i]['start_point'][1] + show_params['line_num'][i]['width'] / 2)) 
+                                    turning_points.append( (tmp, show_params['line'][i]['start_point'][1] + show_params['line'][i]['width'] / 2)) 
                         else:
-                            tmp = show_params['line_num'][i]['start_point'][1]       
+                            tmp = show_params['line'][i]['start_point'][1]       
                             for j in range(show_params['line'][i]['turning_points']):
                                 if show_params['line_start_side']: 
-                                    tmp = tmp + (show_params['line_num'][i]['end_point'][1] - show_params['line_num'][i]['start_point'][1]) * 2**(-j-1)
+                                    tmp = tmp + (show_params['line'][i]['end_point'][1] - show_params['line'][i]['start_point'][1]) * 2**(-j-1)
                                 else:
-                                    tmp = show_params['line_num'][i]['start_point'][1] +\
-                                          (show_params['line_num'][i]['end_point'][1] - show_params['line_num'][i]['start_point'][1]) *\
+                                    tmp = show_params['line'][i]['start_point'][1] +\
+                                          (show_params['line'][i]['end_point'][1] - show_params['line'][i]['start_point'][1]) *\
                                           2**( j - show_params['line'][i]['turning_points'])
                                 if j % 2:
-                                    turning_points.append( (show_params['line_num'][i]['start_point'][0] - show_params['line_num'][i]['width'], tmp))
+                                    turning_points.append( (show_params['line'][i]['start_point'][0] - show_params['line'][i]['width'], tmp))
                                 else:
-                                    turning_points.append( (show_params['line_num'][i]['start_point'][0] + show_params['line_num'][i]['width'], tmp) ) 
-                        turning_points.append( show_params['line_num'][i]['end_point'] )             
-                        pygame.draw.lines(surf_pattern, show_params['line_num'][i]['color'],\
-                                          False, turning_points, show_params['line_num'][i]['width']) 
+                                    turning_points.append( (show_params['line'][i]['start_point'][0] + show_params['line'][i]['width'], tmp) ) 
+                        turning_points.append( show_params['line'][i]['end_point'] )             
+                        pygame.draw.lines(surf_pattern, show_params['line'][i]['color'],\
+                                          False, turning_points, show_params['line'][i]['width']) 
         # draw foreground
-        if show_params['fore_heightave']:
-            for i in range(show_params['fore_kind']):
+        if show_params['fore_have']:
+            for i in range(show_params['fore_kinds']):
                 fore_width = show_params['fore'][i]['h_end']-show_params['fore'][i]['h_start']
                 fore_height = show_params['fore'][i]['v_end']-show_params['fore'][i]['v_start']
                 if show_params['fore'][i]['ellipse_or_triangle']:
@@ -467,7 +472,7 @@ class mc_class:
         surf_curtain.blit(pygame.transform.flip(surf_pattern,True,False), (300, 0))    
         surf_curtain.blit(self.mask_curtain, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)  
         surf_curtain.set_colorkey(self.color_key)
-        surf_curtain.set_alpha(show_params['alpha']) 
+        surf_curtain.set_alpha(show_params['surf_alpha']) 
         self.screen.blit(surf_curtain, (0,0))       
 
 
@@ -504,7 +509,7 @@ class mc_class:
             surf_score.blit(surf_text, rect_text)
             if pygame.mouse.get_pressed()[0]:
                 if flag_click_enable:
-                    self.ga.scores[idx_curtain] = 100 - (mouse_y-150)/4
+                    self.ga.scores.append(100 - (mouse_y-150)/4)
                     return True
         self.screen.blit(surf_score,(600,0))
         pygame.display.update()
@@ -522,20 +527,21 @@ class mc_class:
         self.ga.scores = []
         self.screen.fill(self.color['white'])        
         for idx_curtain in range(self.ga.num_curtain):
-            show_params = self.init_create_show_params(self.ga.curtains[idx_curtain])
-            self.show_curtain(show_params)
+            show_params = self.init_create_show_params(self.ga.curtains[idx_curtain])            
             flag_click_enable = False
             time_start = pygame.time.get_ticks()
             while True:
                 time_now = pygame.time.get_ticks()
-                if time_now - time_start > 50:
-                    flag_click_enable = True
+                if not flag_click_enable:
+                    if time_now - time_start > 200:
+                        flag_click_enable = True
                 for event in pygame.event.get():                      
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_ESCAPE:
                             self.exit_box()
                             if self.flag_exit:
                                 return
+                self.show_curtain(show_params)            
                 flag_get = self.get_score(idx_curtain, flag_click_enable)
                 if flag_get:
                     flag_click_enable = False
@@ -554,15 +560,15 @@ class mc_class:
                         self.exit_box()
                         if self.flag_exit:
                             return
-            self.screen.fill(self.colot['white'])
+            self.screen.fill(self.color['white'])
             self.show_curtain(show_params)
-            surf_text, rect_text = self.text_object('I guess you like this.','comicsansms',30, self.colot['black'])
+            surf_text, rect_text = self.text_object('I guess you like this.','comicsansms',30, self.color['black'])
             rect_text.center = (800,200)
             self.screen.blit(surf_text, rect_text)
-            surf_text, rect_text = self.text_object('And the curtain image','comicsansms',30, self.colot['black'])
+            surf_text, rect_text = self.text_object('And the curtain image','comicsansms',30, self.color['black'])
             rect_text.center = (800,300)
             self.screen.blit(surf_text, rect_text)
-            surf_text, rect_text = self.text_object(' has been saved.','comicsansms',30, self.colot['black'])
+            surf_text, rect_text = self.text_object(' has been saved.','comicsansms',30, self.color['black'])
             rect_text.center = (800,400)
             self.screen.blit(surf_text, rect_text)
             pygame.display.update()            
