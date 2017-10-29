@@ -330,7 +330,7 @@ class mc_class:
         for i in range(params['line_num']):            
             params['line'].append([]) 
             params['line'][i] = {}
-            line_color = randint(-curtain['back_pattern_adjust_rgb'], curtain['back_pattern_adjust_rgb'])
+            line_color = self.myrand(-curtain['back_pattern_adjust_rgb'], curtain['back_pattern_adjust_rgb'])
             params['line'][i]['color'] = (\
                   min(255,max(0, curtain['back_r'] + line_color )),\
                   min(255,max(0, curtain['back_g'] + line_color )),\
@@ -339,12 +339,12 @@ class mc_class:
                 params['line'][i]['color'] = (1, 1, 1)
 #            print(line_range_start )
 #            print(line_step)
-            line_pos_bias = randint( line_range_start + line_step*i, line_range_start + line_step*(i+1) )          
-            line_length = randint( curtain['line_length_min'], curtain['line_length_max'])
+            line_pos_bias = self.myrand( line_range_start + line_step*i, line_range_start + line_step*(i+1) )          
+            line_length = self.myrand( curtain['line_length_min'], curtain['line_length_max'])
             if line_step * curtain['line_width_max'] - 100 - line_step * curtain['line_width_min'] / 100 < 1:
-                params['line'][i]['width'] = randint( line_step * curtain['line_width_min'] / 100, line_step * curtain['line_width_min'] / 100 + 1)
+                params['line'][i]['width'] = self.myrand( line_step * curtain['line_width_min'] / 100, line_step * curtain['line_width_min'] / 100 + 1)
             else:
-                params['line'][i]['width'] = randint( line_step * curtain['line_width_min'] / 100, line_step * curtain['line_width_max'] / 100)                
+                params['line'][i]['width'] = self.myrand( line_step * curtain['line_width_min'] / 100, line_step * curtain['line_width_max'] / 100)                
             if params['line_direction']:
                 if params['line_start_side']:
                     params['line'][i]['start_point'] = ( 300 * ( 1 - line_length / 100 ), line_pos_bias )
@@ -359,7 +359,7 @@ class mc_class:
                 else:
                     params['line'][i]['start_point'] = ( line_pos_bias, 0 )
                     params['line'][i]['end_point'] = ( line_pos_bias, 600 * line_length / 100 )
-            params['line'][i]['turning_points'] = randint(1,curtain['lines_turning_points'])
+            params['line'][i]['turning_points'] = self.myrand(1,curtain['lines_turning_points'])
         # foreground
         if curtain['fore_have'] < 50:
             params['fore_have'] = False
@@ -372,9 +372,9 @@ class mc_class:
             params['fore'][i] = {}
             params['fore'][i]['ellipse_or_triangle'] = ( randint(101) < curtain['ellipse_or_triangle'])
             fore_color = []
-            fore_color.append(randint( -curtain['fore_adjust_range_r'], curtain['fore_adjust_range_r']))
-            fore_color.append(randint( -curtain['fore_adjust_range_g'], curtain['fore_adjust_range_g']))
-            fore_color.append(randint( -curtain['fore_adjust_range_b'], curtain['fore_adjust_range_b']))
+            fore_color.append(self.myrand( -curtain['fore_adjust_range_r'], curtain['fore_adjust_range_r']))
+            fore_color.append(self.myrand( -curtain['fore_adjust_range_g'], curtain['fore_adjust_range_g']))
+            fore_color.append(self.myrand( -curtain['fore_adjust_range_b'], curtain['fore_adjust_range_b']))
             params['fore'][i]['color'] = (\
                   int(min(255,max(0, curtain['back_r'] + fore_color[0]))),\
                   int(min(255,max(0, curtain['back_g'] + fore_color[1]))),\
@@ -382,12 +382,12 @@ class mc_class:
             if params['fore'][i]['color'] == (0, 0, 0):
                 params['fore'][i]['color'] = (1, 1, 1)
             params['fore'][i]['h_start'] = 300 * randint( curtain['fore_h_start_lim'] )/100
-            params['fore'][i]['h_end'] = 300 * randint( curtain['fore_h_end_lim'], 100 )/100   
+            params['fore'][i]['h_end'] = 300 * self.myrand( curtain['fore_h_end_lim'], 100 )/100   
             params['fore'][i]['v_start'] = 600 * randint( curtain['fore_v_start_lim'] )/100
-            params['fore'][i]['v_end'] = 600 * randint( curtain['fore_v_end_lim'], 100 )/100
-            params['fore'][i]['h_num'] = randint( curtain['fore_h_num_base'] * 0.5, curtain['fore_h_num_base'] * 1.5 )     
-            params['fore'][i]['v_num'] = randint( curtain['fore_v_num_base'] * 0.5, curtain['fore_v_num_base'] * 1.5 ) 
-            params['fore'][i]['size'] = randint( curtain['fore_pattern_size_base'] * 0.5, curtain['fore_pattern_size_base'] * 1.5 )  
+            params['fore'][i]['v_end'] = 600 * self.myrand( curtain['fore_v_end_lim'], 100 )/100
+            params['fore'][i]['h_num'] = self.myrand( curtain['fore_h_num_base'] * 0.5, curtain['fore_h_num_base'] * 1.5 )     
+            params['fore'][i]['v_num'] = self.myrand( curtain['fore_v_num_base'] * 0.5, curtain['fore_v_num_base'] * 1.5 ) 
+            params['fore'][i]['size'] = self.myrand( curtain['fore_pattern_size_base'] * 0.5, curtain['fore_pattern_size_base'] * 1.5 )  
         return params
       
     
@@ -583,4 +583,9 @@ class mc_class:
             if flag_save:
                 pygame.image.save(self.screen, os.path.join(self.root_path, 'res.jpg'))
                 flag_save = False
-        
+     
+    def myrand(self,a,b):
+        if b - a < 1:
+            return randint(a, a + 1)
+        else:
+            return randint(a, b)
