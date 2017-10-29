@@ -320,8 +320,8 @@ class mc_class:
             line_range_end = curtain_range
         line_range = line_range_end - line_range_start + 1
         line_step = line_range / params['line_num']
-        if line_step == 0:
-            line_step = 0.1
+        if line_step <1:
+            line_step = 1
         if curtain['line_or_lines'] < 50:
             params['line_or_lines'] = False
         else:
@@ -337,11 +337,14 @@ class mc_class:
                   min(255,max(0, curtain['back_b'] + line_color )))
             if params['line'][i]['color'] == (0, 0, 0):
                 params['line'][i]['color'] = (1, 1, 1)
-            line_pos_bias = randint( line_range_start + line_step*i, line_range_start + line_step*(i+1) )
+#            print(line_range_start )
+#            print(line_step)
+            line_pos_bias = randint( line_range_start + line_step*i, line_range_start + line_step*(i+1) )          
             line_length = randint( curtain['line_length_min'], curtain['line_length_max'])
-            if curtain['line_width_min'] == curtain['line_width_max']:
-                curtain['line_width_max'] += 0.1
-            params['line'][i]['width'] = randint( line_step * curtain['line_width_min'] / 100, line_step * curtain['line_width_max'] / 100)
+            if line_step * curtain['line_width_max'] - 100 - line_step * curtain['line_width_min'] / 100 < 1:
+                params['line'][i]['width'] = randint( line_step * curtain['line_width_min'] / 100, line_step * curtain['line_width_min'] / 100 + 1)
+            else:
+                params['line'][i]['width'] = randint( line_step * curtain['line_width_min'] / 100, line_step * curtain['line_width_max'] / 100)                
             if params['line_direction']:
                 if params['line_start_side']:
                     params['line'][i]['start_point'] = ( 300 * ( 1 - line_length / 100 ), line_pos_bias )
@@ -522,7 +525,8 @@ class mc_class:
     
     def score_curtain(self):
         if self.idx_step == 1:
-            seed(pygame.time.get_ticks())
+            seed(1)
+#            seed(pygame.time.get_ticks())
             self.ga = ga_class()
         else:
             self.ga.now_generation += 1
