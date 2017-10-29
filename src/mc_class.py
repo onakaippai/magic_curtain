@@ -320,6 +320,8 @@ class mc_class:
             line_range_end = curtain_range
         line_range = line_range_end - line_range_start + 1
         line_step = line_range / params['line_num']
+        if line_step == 0:
+            line_step = 0.1
         if curtain['line_or_lines'] < 50:
             params['line_or_lines'] = False
         else:
@@ -337,6 +339,8 @@ class mc_class:
                 params['line'][i]['color'] = (1, 1, 1)
             line_pos_bias = randint( line_range_start + line_step*i, line_range_start + line_step*(i+1) )
             line_length = randint( curtain['line_length_min'], curtain['line_length_max'])
+            if curtain['line_width_min'] == curtain['line_width_max']:
+                curtain['line_width_max'] += 0.1
             params['line'][i]['width'] = randint( line_step * curtain['line_width_min'] / 100, line_step * curtain['line_width_max'] / 100)
             if params['line_direction']:
                 if params['line_start_side']:
