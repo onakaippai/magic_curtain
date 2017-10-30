@@ -1,31 +1,19 @@
 # Magic Curtain   
+遺伝的アルゴリズムを用いた   
+個性的なカーテン柄自動生成アプリ   
 
-遺伝的アルゴリズムを用いた（勉強中）   
-個性的なカーテン柄をデザインする（生成？）   
-アプリ開発のリポジトリです（たぶん）。   
-## 開発環境について
- * Python 3.6.0
- * Anaconda 4.3.0
- * Spyder 3.1.2
- * pygame 1.9.3
+## 開発環境
+ * Python 3.6.0 (numpy 1.11.3)
+ * pygame 1.9.3 [[参考動画]](https://www.youtube.com/watch?v=ki_5uS4bOgQ) [[download link]](http://www.lfd.uci.edu/~gohlke/pythonlibs/#pygame)
 
-お時間があれば、交流会の前に開発環境の準備をしてください。  
-（できるだけ、上記のバージョンと同じく、あるいはこれ以上のバージョン）   
-
-## インストール
-各自のOSに応じて適切なバージョンをdownloadしてください（特に64bit/32bit）。   
-①  Python +  Anaconda + Spyder   
-　 AnacondaがPythonを含める含めるので、   
-　 Anacondaをインストールした後に、Pythonをインストール必要がありません。  
-　 Python経験者の方は自分が好きな開発環境を使って大丈夫です。   
-　 [[参考動画]](https://www.youtube.com/watch?v=Q0jGAZAdZqM)  
-　 [[download link]](https://www.anaconda.com/download/#windows)   
-② Pygame
-　 今回はGUI設計とマルチメディアのコンテンツ追加に便利な  
-　 ゲーム開発ライブラリを使用します。  
-　 [[参考動画]](https://www.youtube.com/watch?v=ki_5uS4bOgQ)   
-　 [[download link]](http://www.lfd.uci.edu/~gohlke/pythonlibs/#pygame)  
-
-## ご質問・ご指摘受付
-LINEで私にご連絡ください。
-または、issuesにメッセージを追加してください。
+##画像準備  
+下記のリンクから画像をダウンロードし、正方形エリアを切り出し(curtain.jpg以外)、  
+指定名で、./img/ フォルダの中に保存してください。
+ *[[curtain.jpg]](https://target.scene7.com/is/image/Target/16566890?wid=328&hei=328&qlt=80&fmt=pjpeg)
+ *[[spring.jpg]](http://www.aucklandbotanicgardens.co.nz/media/1096/spring-blossom-valley-primus-pink-cloud.jpg)
+ *[[summer.jpg]](http://mefeater.com/wp-content/uploads/2015/06/summer.jpg)
+ *[[autumn.jpg]](http://hddesktopwallpapers.in/wp-content/uploads/2015/09/red-autumn-forest.jpg)
+ *[[winter.jpg]](https://mid-atlanticcontrol.com/wp-content/uploads/2016/02/6928556-winter-scenery-pictures.jpg)
+ 
+##実行
+./src/magic_curtain.py を実行してください。
