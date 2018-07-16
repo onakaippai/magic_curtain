@@ -16,4 +16,6 @@
  * [[winter.jpg]](https://mid-atlanticcontrol.com/wp-content/uploads/2016/02/6928556-winter-scenery-pictures.jpg)
  
 ## 実行
-./src/magic_curtain.py を実行してください。
+./src/magic_curtain.py を実行してください。    
+
+try
